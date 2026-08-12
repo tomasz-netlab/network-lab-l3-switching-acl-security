@@ -1,0 +1,25 @@
+hostname R2
+
+security passwords min-length 12
+service password-encryption
+no cdp run
+
+enable secret <ENABLE_SECRET>
+
+banner motd # WARNING: Authorized access only. Violators will be prosecuted. #
+
+interface Se0/1/0
+description R2-to-WAN
+ip address 172.16.0.1 255.255.255.252
+no shutdown
+
+interface g0/0/0
+description R2-to-Internet-WWW-Server
+ip address 203.0.113.1 255.255.255.252
+no shutdown
+
+ip route 10.0.0.0 255.0.0.0 Serial0/1/0
+ip route 192.168.0.0 255.255.0.0 Serial0/1/0
+
+end
+copy running-config startup-config

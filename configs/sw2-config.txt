@@ -1,0 +1,93 @@
+hostname SW2
+
+security passwords min-length 12
+login block-for 300 attempts 3 within 120
+login on-failure log
+service password-encryption
+
+enable secret <ENABLE_SECRET>
+username admin secret <ADMIN_SECRET>
+
+ip access-list standard ACL_MGMT_VTY
+remark This ACL secures incoming vty lines
+permit 10.0.100.0 0.0.0.31
+deny any
+exit
+
+banner motd # WARNING: Authorized access only. Violators will be prosecuted. #
+
+ip domain-name lab.local.ccna
+crypto key generate rsa
+ip ssh version 2
+ip ssh time-out 120
+ip ssh authentication-retries 3
+
+line console 0
+login local
+exec-timeout 5 0
+logging synchronous
+line vty 0 15
+login local
+transport input ssh
+exec-timeout 5 0
+access-class ACL_MGMT_VTY in
+
+vlan 10
+name HR
+vlan 20
+name FINANCE
+vlan 101
+name Management
+vlan 123
+name Servers
+vlan 99
+name Native
+vlan 999
+name UNUSED
+
+interface range g0/1-2
+description SW2-SW-DISTRO
+switchport mode trunk
+switchport trunk allowed vlan 10,20,101,123
+switchport trunk native vlan 99
+switchport nonegotiate
+no shutdown
+interface g0/2
+description SW2-SW1
+
+interface f0/24
+description ACCESS-Admin-PC
+switchport mode access
+switchport access vlan 101
+switchport port-security maximum 1
+switchport port-security mac-address sticky
+switchport port-security violation restrict
+spanning-tree portfast
+spanning-tree bpduguard enable
+no shutdown
+
+interface range f0/1-23
+description NOT-IN-USE
+switchport access vlan 999
+shutdown
+
+do write memory
+
+spanning-tree mode rapid-pvst
+
+interface vlan 101
+description MANAGEMENT
+ip address 10.0.100.3 255.255.255.224
+no shutdown
+exit
+ip default-gateway 10.0.100.1
+
+ntp server 10.0.120.2
+logging buffered 16384
+service timestamps log datetime msec
+service timestamps debug datetime msec
+logging host 10.0.120.2
+logging trap debugging
+
+end
+copy running-config startup-config

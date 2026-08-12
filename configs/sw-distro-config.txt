@@ -1,0 +1,187 @@
+hostname SW-DISTRO
+
+security passwords min-length 12
+login block-for 300 attempts 3 within 120
+login on-failure log
+service password-encryption
+
+enable secret <ENABLE_SECRET>
+username admin secret <ADMIN_SECRET>
+
+ip access-list extended ACL_FINANCE_IN
+remark This ACL secures FINANCE Zone
+10 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 echo-reply
+20 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 ttl-exceeded
+30 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 unreachable
+40 permit udp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 53
+50 permit tcp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 22
+60 permit udp 192.168.20.0 0.0.0.31 eq 68 10.0.120.0 0.0.0.15 eq 67
+70 permit tcp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 25
+80 permit tcp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 110
+90 permit tcp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 143
+200 deny ip any any
+
+ip access-list extended ACL_HR_IN
+remark This ACL secures HR Zone
+10 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 echo-reply
+20 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 ttl-exceeded
+30 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 unreachable
+40 permit udp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 53
+50 permit udp 192.168.10.0 0.0.0.31 eq 68 10.0.120.0 0.0.0.15 eq 67
+60 permit tcp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 25
+70 permit tcp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 110
+80 permit tcp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 143
+191 deny ip 192.168.10.0 0.0.0.31 10.0.0.0 0.255.255.255
+192 deny ip 192.168.10.0 0.0.0.31 172.16.0.0 0.15.255.255
+193 deny ip 192.168.10.0 0.0.0.31 192.168.0.0 0.0.255.255
+194 permit tcp 192.168.10.0 0.0.0.31 any eq 443
+200 deny ip any any
+
+ip access-list extended ACL_SERVERS_IN
+remark This ACL secures SERVERS Zone
+10 permit icmp 10.0.120.0 0.0.0.15 10.0.100.0 0.0.0.31
+20 permit udp 10.0.120.0 0.0.0.15 eq 53 10.0.100.0 0.0.0.31
+30 permit tcp 10.0.120.0 0.0.0.15 eq 25 10.0.100.0 0.0.0.31 established
+40 permit tcp 10.0.120.0 0.0.0.15 eq 110 10.0.100.0 0.0.0.31 established
+50 permit tcp 10.0.120.0 0.0.0.15 eq 143 10.0.100.0 0.0.0.31 established
+60 permit tcp 10.0.120.0 0.0.0.15 eq 22 10.0.100.0 0.0.0.31 established
+70 permit udp 10.0.120.0 0.0.0.15 eq 123 10.0.100.0 0.0.0.31
+80 permit udp 10.0.120.0 0.0.0.15 eq 53 192.168.20.0 0.0.0.31
+90 permit udp 10.0.120.0 0.0.0.15 eq 67 192.168.20.0 0.0.0.31 eq 68
+100 permit tcp 10.0.120.0 0.0.0.15 eq 25 192.168.20.0 0.0.0.31 established
+110 permit tcp 10.0.120.0 0.0.0.15 eq 110 192.168.20.0 0.0.0.31 established
+120 permit tcp 10.0.120.0 0.0.0.15 eq 143 192.168.20.0 0.0.0.31 established
+130 permit tcp 10.0.120.0 0.0.0.15 eq 22 192.168.20.0 0.0.0.31 established
+140 permit icmp 10.0.120.0 0.0.0.15 192.168.20.0 0.0.0.31
+150 permit udp 10.0.120.0 0.0.0.15 eq 53 192.168.10.0 0.0.0.31
+160 permit udp 10.0.120.0 0.0.0.15 eq 67 192.168.10.0 0.0.0.31 eq 68
+170 permit tcp 10.0.120.0 0.0.0.15 eq 25 192.168.10.0 0.0.0.31 established
+180 permit tcp 10.0.120.0 0.0.0.15 eq 110 192.168.10.0 0.0.0.31 established
+190 permit tcp 10.0.120.0 0.0.0.15 eq 143 192.168.10.0 0.0.0.31 established
+200 permit icmp 10.0.120.0 0.0.0.15 192.168.10.0 0.0.0.31
+391 deny ip 10.0.120.0 0.0.0.15 10.0.0.0 0.255.255.255
+392 deny ip 10.0.120.0 0.0.0.15 172.16.0.0 0.15.255.255
+393 deny ip 10.0.120.0 0.0.0.15 192.168.0.0 0.0.255.255
+394 permit udp 10.0.120.0 0.0.0.15 any eq 53
+395 permit tcp 10.0.120.0 0.0.0.15 any eq 25
+400 deny ip any any
+
+ip access-list extended ACL_MGMT_IN
+remark This ACL secures MGMT Zone
+10 permit icmp 10.0.100.0 0.0.0.31 192.168.20.0 0.0.0.31 echo
+20 permit icmp 10.0.100.0 0.0.0.31 192.168.10.0 0.0.0.31 echo
+30 permit icmp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 echo
+40 permit udp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 53
+50 permit tcp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 25
+60 permit tcp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 110
+70 permit tcp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 143
+80 permit tcp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 22
+90 permit udp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 123
+100 permit udp 10.0.100.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 514
+200 deny ip any any
+
+ip access-list standard ACL_MGMT_VTY
+remark This ACL secures incoming vty lines
+permit 10.0.100.0 0.0.0.31
+deny any
+exit
+
+banner motd # WARNING: Authorized access only. Violators will be prosecuted. #
+
+ip domain-name lab.local.ccna
+crypto key generate rsa
+ip ssh version 2
+ip ssh time-out 120
+ip ssh authentication-retries 3
+
+line console 0
+login local
+exec-timeout 5 0
+logging synchronous
+line vty 0 15
+login local
+transport input ssh
+exec-timeout 5 0
+access-class ACL_MGMT_VTY in
+
+vlan 10
+name HR
+vlan 20
+name FINANCE
+vlan 101
+name Management
+vlan 123
+name Servers
+vlan 99
+name Native
+vlan 999
+name UNUSED
+
+interface g1/0/1
+description SW-DISTRO-R1
+no switchport
+ip address 10.0.1.2 255.255.255.252
+no shutdown
+
+interface g1/0/24
+description SW-DISTRO-SERVER-1
+switchport mode access
+switchport access vlan 123
+switchport port-security maximum 1
+switchport port-security mac-address sticky
+switchport port-security violation shutdown
+spanning-tree portfast
+spanning-tree bpduguard enable
+no shutdown
+
+interface range g1/0/2-3
+description SW-DISTRO-SW1
+switchport mode trunk
+switchport trunk allowed vlan 10,20,101,123
+switchport trunk native vlan 99
+switchport nonegotiate
+no shutdown
+interface g1/0/3
+description SW-DISTRO-SW2
+
+interface range g1/0/4-23, g1/1/1-4
+description NOT-IN-USE
+switchport access vlan 999
+shutdown
+
+do write memory
+
+ip routing
+ip route 0.0.0.0 0.0.0.0 10.0.1.1
+
+interface vlan 10
+description GW_VLAN-10
+ip address 192.168.10.1 255.255.255.224
+ip helper-address 10.0.120.2
+ip access-group ACL_HR_IN in
+interface vlan 20
+description GW_VLAN-20
+ip address 192.168.20.1 255.255.255.224
+ip helper-address 10.0.120.2
+ip access-group ACL_FINANCE_IN in
+interface vlan 101
+description GW_VLAN-101
+ip address 10.0.100.1 255.255.255.224
+ip access-group ACL_MGMT_IN in
+interface vlan 123
+description GW_VLAN-123
+ip address 10.0.120.1 255.255.255.240
+ip access-group ACL_SERVERS_IN in
+
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20,101,123 root primary
+
+ntp server 10.0.120.2
+logging buffered 16384
+service timestamps log datetime msec
+service timestamps debug datetime msec
+logging host 10.0.120.2
+logging trap debugging
+
+end
+copy running-config startup-config
