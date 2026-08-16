@@ -15,6 +15,8 @@ deny any
 exit
 
 ip dhcp snooping
+ip dhcp snooping database flash:dhcp-snooping.db
+ip dhcp snooping database write-delay 30
 ip dhcp snooping vlan 10,20
 no ip dhcp snooping information option
 ip arp inspection vlan 10,20
@@ -66,6 +68,7 @@ interface f0/1
 description ACCESS-PC2
 switchport mode access
 switchport access vlan 20
+switchport port-security
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 switchport port-security violation restrict
@@ -76,6 +79,7 @@ interface f0/2
 description ACCESS-PC1
 switchport mode access
 switchport access vlan 10
+switchport port-security
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 switchport port-security violation restrict
