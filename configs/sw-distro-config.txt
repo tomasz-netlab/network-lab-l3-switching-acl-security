@@ -10,9 +10,11 @@ username admin secret <ADMIN_SECRET>
 
 ip access-list extended ACL_FINANCE_IN
 remark This ACL secures FINANCE Zone
+5 permit icmp 192.168.20.0 0.0.0.31 host 192.168.20.1 echo
 10 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 echo-reply
 20 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 ttl-exceeded
 30 permit icmp 192.168.20.0 0.0.0.31 10.0.100.0 0.0.0.31 unreachable
+35 permit udp host 0.0.0.0 host 255.255.255.255 eq 67
 40 permit udp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 53
 50 permit tcp 192.168.20.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 22
 60 permit udp 192.168.20.0 0.0.0.31 eq 68 10.0.120.0 0.0.0.15 eq 67
@@ -23,10 +25,12 @@ remark This ACL secures FINANCE Zone
 
 ip access-list extended ACL_HR_IN
 remark This ACL secures HR Zone
+5 permit icmp 192.168.10.0 0.0.0.31 host 192.168.10.1 echo
 10 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 echo-reply
 20 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 ttl-exceeded
 30 permit icmp 192.168.10.0 0.0.0.31 10.0.100.0 0.0.0.31 unreachable
 40 permit udp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 53
+45 permit udp host 0.0.0.0 host 255.255.255.255 eq 67
 50 permit udp 192.168.10.0 0.0.0.31 eq 68 10.0.120.0 0.0.0.15 eq 67
 60 permit tcp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 25
 70 permit tcp 192.168.10.0 0.0.0.31 10.0.120.0 0.0.0.15 eq 110
@@ -54,6 +58,8 @@ remark This ACL secures SERVERS Zone
 130 permit tcp 10.0.120.0 0.0.0.15 eq 22 192.168.20.0 0.0.0.31 established
 140 permit icmp 10.0.120.0 0.0.0.15 192.168.20.0 0.0.0.31
 150 permit udp 10.0.120.0 0.0.0.15 eq 53 192.168.10.0 0.0.0.31
+155 permit udp 10.0.120.0 0.0.0.15 eq 67 192.168.10.0 0.0.0.31 eq 67
+156 permit udp 10.0.120.0 0.0.0.15 eq 67 192.168.20.0 0.0.0.31 eq 67
 160 permit udp 10.0.120.0 0.0.0.15 eq 67 192.168.10.0 0.0.0.31 eq 68
 170 permit tcp 10.0.120.0 0.0.0.15 eq 25 192.168.10.0 0.0.0.31 established
 180 permit tcp 10.0.120.0 0.0.0.15 eq 110 192.168.10.0 0.0.0.31 established
@@ -127,6 +133,7 @@ interface g1/0/24
 description SW-DISTRO-SERVER-1
 switchport mode access
 switchport access vlan 123
+switchport port-security
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 switchport port-security violation shutdown
