@@ -59,6 +59,7 @@ interface f0/24
 description ACCESS-Admin-PC
 switchport mode access
 switchport access vlan 101
+switchport port-security
 switchport port-security maximum 1
 switchport port-security mac-address sticky
 switchport port-security violation restrict
